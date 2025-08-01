@@ -1,15 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, MessageCircle, Mail, Lock, User, MapPin, Briefcase } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useAuth } from '@/contexts/AuthContext'
+import { showToast } from '@/components/ui/toast'
 import Link from 'next/link'
 import { validateEmail, validatePassword } from '@/lib/utils'
 
 export default function RegisterPage() {
+  const router = useRouter()
+  const { register, isLoading } = useAuth()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     username: '',
@@ -25,7 +30,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
 
   const skillOptions = [
     'طراحی گرافیک',
@@ -125,21 +129,9 @@ export default function RegisterPage() {
     
     if (!validateStep2()) return
 
-    setIsLoading(true)
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Here you would make actual API call to backend
-      console.log('Registration attempt:', formData)
-      
-      // Redirect to dashboard on success
-      window.location.href = '/dashboard'
-    } catch (error) {
-      setErrors({ general: 'خطا در ثبت‌نام. لطفاً دوباره تلاش کنید.' })
-    } finally {
-      setIsLoading(false)
+    const result = await register(formData)
+    if (result.success) {
+      router.push('/chat')
     }
   }
 

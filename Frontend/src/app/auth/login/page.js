@@ -1,21 +1,25 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, MessageCircle, Mail, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/contexts/AuthContext'
+import { showToast } from '@/components/ui/toast'
 import Link from 'next/link'
 import { validateEmail } from '@/lib/utils'
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { login, isLoading } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -54,21 +58,9 @@ export default function LoginPage() {
     
     if (!validateForm()) return
 
-    setIsLoading(true)
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Here you would make actual API call to backend
-      console.log('Login attempt:', formData)
-      
-      // Redirect to dashboard on success
-      window.location.href = '/dashboard'
-    } catch (error) {
-      setErrors({ general: 'خطا در ورود. لطفاً دوباره تلاش کنید.' })
-    } finally {
-      setIsLoading(false)
+    const result = await login(formData)
+    if (result.success) {
+      router.push('/chat')
     }
   }
 
