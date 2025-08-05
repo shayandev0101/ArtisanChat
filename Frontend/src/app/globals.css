@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
 @tailwind base;
 @tailwind components;
@@ -56,61 +55,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter;
-  }
-  
-  [dir="rtl"] {
-    @apply font-vazir;
-  }
-  
-  .rtl {
+    @apply bg-background text-foreground font-vazir;
     direction: rtl;
-  }
-  
-  .ltr {
-    direction: ltr;
-  }
-}
-
-@layer components {
-  .chat-bubble {
-    @apply max-w-xs lg:max-w-md px-4 py-2 rounded-2xl break-words;
-  }
-  
-  .chat-bubble-sent {
-    @apply bg-artisan-500 text-white ml-auto rounded-br-md;
-  }
-  
-  .chat-bubble-received {
-    @apply bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 mr-auto rounded-bl-md;
-  }
-  
-  .typing-indicator {
-    @apply flex space-x-1 p-3;
-  }
-  
-  .typing-dot {
-    @apply w-2 h-2 bg-gray-400 rounded-full animate-bounce;
-  }
-  
-  .portfolio-card {
-    @apply relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1;
-  }
-  
-  .portfolio-overlay {
-    @apply absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100;
-  }
-  
-  .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-  
-  .creative-gradient {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  }
-  
-  .artisan-gradient {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   }
 }
 
@@ -120,140 +66,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-muted;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  @apply bg-border rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
-}
-
-/* Glassmorphism effects */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Shimmer animation for skeleton loading */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite linear;
-}
-
-/* Animation for file upload */
-.file-upload-area {
-  @apply border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center transition-colors duration-200;
-}
-
-.file-upload-area.drag-over {
-  @apply border-artisan-500 bg-artisan-50 dark:bg-artisan-900/20;
-}
-
-/* Modern button hover effects */
-.btn-hover-lift {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Notification styles */
-.notification {
-  @apply fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300;
-}
-
-.notification.success {
-  @apply bg-green-500 text-white;
-}
-
-.notification.error {
-  @apply bg-red-500 text-white;
-}
-
-.notification.info {
-  @apply bg-blue-500 text-white;
-}
-
-/* Loading spinner */
-.spinner {
-  @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
-}
-
-/* Chat bubble animations */
-.chat-bubble-enter {
-  animation: chatBubbleEnter 0.3s ease-out;
-}
-
-@keyframes chatBubbleEnter {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Typing indicator animation */
-.typing-dot {
-  animation: typingDot 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes typingDot {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* Responsive design helpers */
-@media (max-width: 768px) {
-  .mobile-hidden {
-    @apply hidden;
-  }
-  
-  .mobile-full {
-    @apply w-full;
-  }
-  
-  .mobile-chat-sidebar {
-    @apply fixed inset-0 z-50 bg-white transform transition-transform duration-300;
-  }
-  
-  .mobile-chat-sidebar.closed {
-    @apply -translate-x-full;
-  }
-}
-
-/* Print styles for SEO */
-@media print {
-  .no-print {
-    display: none !important;
-  }
+  @apply bg-accent-foreground/20;
 }

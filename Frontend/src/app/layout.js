@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google'
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/AuthContext'
 import './globals.css'
 
@@ -49,12 +49,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fa" dir="rtl" className="rtl">
+    <html lang="fa" dir="rtl">
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0ea5e9" />
+        <meta name="theme-color" content="#3b82f6" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <script
           type="application/ld+json"
