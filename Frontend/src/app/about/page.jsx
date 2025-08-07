@@ -1,11 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { MessageCircle, Users, Heart, Award, Target, Lightbulb } from 'lucide-react'
+import { MessageCircle, Users, Heart, Award, Target, Lightbulb, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTheme } from '@/contexts/ThemeContext'
 import Link from 'next/link'
 
 export default function AboutPage() {
+  const { theme, toggleTheme } = useTheme()
+
   const team = [
     {
       name: 'علی احمدی',
@@ -51,7 +54,7 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50">
+    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -59,10 +62,22 @@ export default function AboutPage() {
             <div className="w-10 h-10 bg-artisan-gradient rounded-lg flex items-center justify-center">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">ArtisanChat</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
           </Link>
           
           <div className="flex items-center space-x-4 space-x-reverse">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <Link href="/auth/login">
               <Button variant="ghost">ورود</Button>
             </Link>
@@ -80,10 +95,10 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             درباره <span className="bg-gradient-to-r from-artisan-600 to-creative-600 bg-clip-text text-transparent">ArtisanChat</span>
           </h1>
-          <p className="text-xl text-gray-700 mb-8 leading-relaxed">
+          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
             ما تیمی از خلاق‌ها و توسعه‌دهندگان هستیم که با هدف ایجاد بهترین پلتفرم ارتباطی 
             برای جامعه خلاق‌های ایران، ArtisanChat را طراحی کرده‌ایم.
           </p>
@@ -98,8 +113,8 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">داستان ما</h2>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">داستان ما</h2>
+            <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
               <p>
                 ArtisanChat از یک نیاز واقعی متولد شد. ما خودمان طراحان، عکاس‌ها و فریلنسرهایی بودیم 
                 که با چالش‌های ارتباطی در پروژه‌هایمان دست و پنجه نرم می‌کردیم.
@@ -122,23 +137,23 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-artisan-600 mb-2">10K+</div>
-                  <div className="text-gray-600">خلاق فعال</div>
+                  <div className="text-gray-600 dark:text-gray-400">خلاق فعال</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-creative-600 mb-2">50K+</div>
-                  <div className="text-gray-600">نمونه‌کار</div>
+                  <div className="text-gray-600 dark:text-gray-400">نمونه‌کار</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-artisan-600 mb-2">1M+</div>
-                  <div className="text-gray-600">پیام ارسالی</div>
+                  <div className="text-gray-600 dark:text-gray-400">پیام ارسالی</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-creative-600 mb-2">500+</div>
-                  <div className="text-gray-600">پروژه تکمیل شده</div>
+                  <div className="text-gray-600 dark:text-gray-400">پروژه تکمیل شده</div>
                 </div>
               </div>
             </div>
@@ -154,8 +169,8 @@ export default function AboutPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">ارزش‌های ما</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">ارزش‌های ما</h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             این ارزش‌ها راهنمای ما در تصمیم‌گیری‌ها و توسعه محصول هستند
           </p>
         </motion.div>
@@ -168,15 +183,15 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <div className="w-12 h-12 bg-gradient-to-br from-artisan-500 to-creative-500 rounded-lg flex items-center justify-center mb-4">
                 <value.icon className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {value.title}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                 {value.description}
               </p>
             </motion.div>
@@ -192,8 +207,8 @@ export default function AboutPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">تیم ما</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">تیم ما</h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             افرادی که با عشق و تخصص ArtisanChat را می‌سازند
           </p>
         </motion.div>
@@ -206,7 +221,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center"
             >
               <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
                 <img
@@ -215,13 +230,13 @@ export default function AboutPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                 {member.name}
               </h3>
               <p className="text-artisan-600 font-medium mb-3">
                 {member.role}
               </p>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                 {member.bio}
               </p>
             </motion.div>
@@ -254,7 +269,7 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

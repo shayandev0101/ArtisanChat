@@ -51,6 +51,30 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        artisan: {
+          50: "hsl(var(--artisan-50))",
+          100: "hsl(var(--artisan-100))",
+          200: "hsl(var(--artisan-200))",
+          300: "hsl(var(--artisan-300))",
+          400: "hsl(var(--artisan-400))",
+          500: "hsl(var(--artisan-500))",
+          600: "hsl(var(--artisan-600))",
+          700: "hsl(var(--artisan-700))",
+          800: "hsl(var(--artisan-800))",
+          900: "hsl(var(--artisan-900))",
+        },
+        creative: {
+          50: "hsl(var(--creative-50))",
+          100: "hsl(var(--creative-100))",
+          200: "hsl(var(--creative-200))",
+          300: "hsl(var(--creative-300))",
+          400: "hsl(var(--creative-400))",
+          500: "hsl(var(--creative-500))",
+          600: "hsl(var(--creative-600))",
+          700: "hsl(var(--creative-700))",
+          800: "hsl(var(--creative-800))",
+          900: "hsl(var(--creative-900))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -73,6 +97,10 @@ module.exports = {
       },
       fontFamily: {
         'vazir': ['Vazirmatn', 'sans-serif'],
+      },
+      backgroundImage: {
+        'artisan-gradient': 'linear-gradient(135deg, hsl(var(--artisan-500)), hsl(var(--artisan-600)))',
+        'creative-gradient': 'linear-gradient(135deg, hsl(var(--creative-500)), hsl(var(--creative-600)))',
       }
     },
   },

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { showToast } from '@/components/ui/toast'
+import { Toaster } from '@/components/ui/toaster'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
@@ -37,7 +37,7 @@ api.interceptors.response.use(
     }
     
     const message = error.response?.data?.message || 'خطایی رخ داده است'
-    showToast.error(message)
+    Toaster.error(message)
     
     return Promise.reject(error)
   }

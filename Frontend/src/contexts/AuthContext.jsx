@@ -3,7 +3,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { authAPI } from '@/lib/api'
 import { socketManager } from '@/lib/socket'
-import { showToast } from '@/components/ui/toast'
+import { toast } from '@/hooks/use-toast'
 
 const AuthContext = createContext()
 
@@ -99,12 +99,22 @@ export function AuthProvider({ children }) {
       // Connect socket
       socketManager.connect(token)
       
-      showToast.success('با موفقیت وارد شدید')
+      toast({
+        title: "ورود موفق",
+        description: "با موفقیت وارد شدید",
+      })
+      
       return { success: true }
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false })
       const message = error.response?.data?.message || 'خطا در ورود'
-      showToast.error(message)
+      
+      toast({
+        title: "خطا در ورود",
+        description: message,
+        variant: "destructive",
+      })
+      
       return { success: false, message }
     }
   }
@@ -124,12 +134,22 @@ export function AuthProvider({ children }) {
       // Connect socket
       socketManager.connect(token)
       
-      showToast.success('حساب کاربری با موفقیت ایجاد شد')
+      toast({
+        title: "ثبت‌نام موفق",
+        description: "حساب کاربری با موفقیت ایجاد شد",
+      })
+      
       return { success: true }
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false })
       const message = error.response?.data?.message || 'خطا در ثبت‌نام'
-      showToast.error(message)
+      
+      toast({
+        title: "خطا در ثبت‌نام",
+        description: message,
+        variant: "destructive",
+      })
+      
       return { success: false, message }
     }
   }
@@ -147,7 +167,11 @@ export function AuthProvider({ children }) {
       socketManager.disconnect()
       
       dispatch({ type: 'LOGOUT' })
-      showToast.success('با موفقیت خارج شدید')
+      
+      toast({
+        title: "خروج موفق",
+        description: "با موفقیت خارج شدید",
+      })
     }
   }
 

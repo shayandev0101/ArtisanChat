@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MessageCircle, Mail, Phone, MapPin, Send, Clock, Users } from 'lucide-react'
+import { MessageCircle, Mail, Phone, MapPin, Send, Clock, Users, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { showToast } from '@/components/ui/toast'
+import { toast } from '@/hooks/use-toast'
+import { useTheme } from '@/contexts/ThemeContext'
 import Link from 'next/link'
 
 export default function ContactPage() {
+  const { theme, toggleTheme } = useTheme()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,10 +35,17 @@ export default function ContactPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      showToast.success('پیام شما با موفقیت ارسال شد. به زودی با شما تماس خواهیم گرفت.')
+      toast({
+        title: "پیام ارسال شد",
+        description: "پیام شما با موفقیت ارسال شد. به زودی با شما تماس خواهیم گرفت.",
+      })
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch (error) {
-      showToast.error('خطا در ارسال پیام. لطفاً دوباره تلاش کنید.')
+      toast({
+        title: "خطا در ارسال",
+        description: "خطا در ارسال پیام. لطفاً دوباره تلاش کنید.",
+        variant: "destructive",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -89,7 +98,7 @@ export default function ContactPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50">
+    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -97,10 +106,22 @@ export default function ContactPage() {
             <div className="w-10 h-10 bg-artisan-gradient rounded-lg flex items-center justify-center">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">ArtisanChat</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
           </Link>
           
           <div className="flex items-center space-x-4 space-x-reverse">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <Link href="/auth/login">
               <Button variant="ghost">ورود</Button>
             </Link>
@@ -117,10 +138,10 @@ export default function ContactPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             تماس با <span className="bg-gradient-to-r from-artisan-600 to-creative-600 bg-clip-text text-transparent">ما</span>
           </h1>
-          <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             سوال دارید؟ نیاز به راهنمایی دارید؟ تیم ما آماده کمک به شماست.
           </p>
         </motion.div>
@@ -136,18 +157,18 @@ export default function ContactPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg text-center"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg text-center"
             >
               <div className="w-12 h-12 bg-gradient-to-br from-artisan-500 to-creative-500 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <info.icon className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {info.title}
               </h3>
               <p className="text-artisan-600 font-medium mb-2">
                 {info.value}
               </p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 {info.description}
               </p>
             </motion.div>
@@ -161,11 +182,11 @@ export default function ContactPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">پیام بفرستید</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">پیام بفرستید</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     نام و نام خانوادگی
                   </label>
                   <Input
@@ -177,7 +198,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     ایمیل
                   </label>
                   <Input
@@ -192,7 +213,7 @@ export default function ContactPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   موضوع
                 </label>
                 <Input
@@ -205,7 +226,7 @@ export default function ContactPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   پیام
                 </label>
                 <Textarea
@@ -245,7 +266,7 @@ export default function ContactPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">سوالات متداول</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">سوالات متداول</h2>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <motion.div
@@ -254,12 +275,12 @@ export default function ContactPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white/60 backdrop-blur-sm rounded-lg p-6 shadow-sm"
+                  className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 shadow-sm"
                 >
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                     {faq.question}
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                     {faq.answer}
                   </p>
                 </motion.div>
@@ -281,7 +302,7 @@ export default function ContactPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

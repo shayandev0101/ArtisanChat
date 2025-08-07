@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { MessageCircle, Users, Image, Calendar, Zap, Shield, Globe, Palette } from 'lucide-react'
+import { MessageCircle, Users, Image, Calendar, Zap, Shield, Globe, Palette, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTheme } from '@/contexts/ThemeContext'
 import Link from 'next/link'
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     setIsLoaded(true)
@@ -57,7 +59,7 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50">
+    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -70,8 +72,8 @@ export default function HomePage() {
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">ArtisanChat</h1>
-              <p className="text-xs text-gray-600">جایی که هنر به خلاقیت تبدیل میشه</p>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</h1>
+              <p className="text-xs text-gray-600 dark:text-gray-400">جایی که هنر به خلاقیت تبدیل میشه</p>
             </div>
           </motion.div>
           
@@ -80,6 +82,18 @@ export default function HomePage() {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-4 space-x-reverse"
           >
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <Link href="/auth/login">
               <Button variant="ghost">ورود</Button>
             </Link>
@@ -97,15 +111,15 @@ export default function HomePage() {
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6">
             <span className="bg-gradient-to-r from-artisan-600 to-creative-600 bg-clip-text text-transparent">
               ArtisanChat
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-4 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-4 max-w-3xl mx-auto leading-relaxed">
             جایی که هنر به خلاقیت و گفت وگو تبدیل میشه!
           </p>
-          <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             پیام‌رسان حرفه‌ای برای طراحان گرافیک، عکاس‌ها، نویسندگان و فریلنسرها
             با امکانات منحصر به فرد برای همکاری و اشتراک‌گذاری نمونه‌کارها
           </p>
@@ -138,10 +152,10 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             ویژگی‌های منحصر به فرد
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             همه چیزی که یک خلاق حرفه‌ای برای همکاری و اشتراک‌گذاری نیاز دارد
           </p>
         </motion.div>
@@ -154,15 +168,15 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
             >
               <div className="w-12 h-12 bg-artisan-gradient rounded-lg flex items-center justify-center mb-4">
                 <feature.icon className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
@@ -194,7 +208,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -238,7 +252,7 @@ export default function HomePage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 ArtisanChat. تمامی حقوق محفوظ است.</p>
+            <p>&copy; 2025 ArtisanChat. تمامی حقوق محفوظ است.</p>
           </div>
         </div>
       </footer>
