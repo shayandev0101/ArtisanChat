@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { useTheme } from '@/contexts/ThemeContext'
 import { 
   Search, 
   Plus, 
@@ -26,11 +27,14 @@ import {
   Archive,
   Edit3,
   Bot,
-  Settings2
+  Settings2,
+  Moon,
+  Sun
 } from 'lucide-react'
 
 export default function ChatPage() {
   const { user, isLoading: authLoading } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const [chats, setChats] = useState([])
   const [activeChat, setActiveChat] = useState(null)
   const [messages, setMessages] = useState([])
@@ -277,7 +281,7 @@ export default function ChatPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
@@ -286,7 +290,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Left Sidebar - Categories */}
-      <div className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-4">
+      <div className="w-16 bg-gray-800 dark:bg-gray-950 flex flex-col items-center py-4 space-y-4">
         {sidebarItems.map((item, index) => (
           <div key={index} className="relative group">
             <div className={`p-2 rounded-lg cursor-pointer transition-colors ${
@@ -307,6 +311,22 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
+        
+        {/* Theme Toggle */}
+        <div className="mt-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-gray-400 hover:text-white hover:bg-gray-700"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Chat List */}

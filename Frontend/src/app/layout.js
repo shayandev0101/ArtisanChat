@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google'
 import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -77,12 +78,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <div id="root">
-            {children}
-          </div>
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <div id="root">
+              {children}
+            </div>
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
         <div id="modal-root"></div>
       </body>
     </html>
