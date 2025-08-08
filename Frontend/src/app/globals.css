@@ -76,3 +76,12 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-accent-foreground/20;
 }
+
+/* Glassmorphism effects */
+.glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+
+.glass-dark {
+  @apply bg-black/10 backdrop-blur-md border border-white/10;
+}

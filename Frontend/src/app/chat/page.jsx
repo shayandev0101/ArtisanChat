@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { useTheme } from '@/contexts/ThemeContext'
 import { 
   Search, 
   Plus, 
@@ -30,7 +31,6 @@ import {
   Moon,
   Sun
 } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
 
 export default function ChatPage() {
   const { user, isLoading: authLoading } = useAuth()

@@ -3,7 +3,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import './globals.css'
-// import './fonts.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -58,8 +57,6 @@ export default function RootLayout({ children }) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

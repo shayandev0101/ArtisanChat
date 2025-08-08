@@ -98,12 +98,12 @@ export default function ContactPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 space-x-reverse">
-            <div className="w-10 h-10 bg-artisan-gradient rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
@@ -126,7 +126,9 @@ export default function ContactPage() {
               <Button variant="ghost">ورود</Button>
             </Link>
             <Link href="/auth/register">
-              <Button variant="artisan">ثبت‌نام رایگان</Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                ثبت‌نام رایگان
+              </Button>
             </Link>
           </div>
         </nav>
@@ -139,7 +141,7 @@ export default function ContactPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            تماس با <span className="bg-gradient-to-r from-artisan-600 to-creative-600 bg-clip-text text-transparent">ما</span>
+            تماس با <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ما</span>
           </h1>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             سوال دارید؟ نیاز به راهنمایی دارید؟ تیم ما آماده کمک به شماست.
@@ -157,15 +159,15 @@ export default function ContactPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg text-center"
+              className="glass dark:glass-dark rounded-xl p-6 shadow-lg text-center"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-artisan-500 to-creative-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <info.icon className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {info.title}
               </h3>
-              <p className="text-artisan-600 font-medium mb-2">
+              <p className="text-blue-600 font-medium mb-2">
                 {info.value}
               </p>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -241,8 +243,7 @@ export default function ContactPage() {
               
               <Button
                 type="submit"
-                variant="artisan"
-                className="w-full"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -275,7 +276,7 @@ export default function ContactPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 shadow-sm"
+                  className="glass dark:glass-dark rounded-lg p-6 shadow-sm"
                 >
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                     {faq.question}
@@ -287,7 +288,7 @@ export default function ContactPage() {
               ))}
             </div>
             
-            <div className="mt-8 p-6 bg-gradient-to-r from-artisan-500 to-creative-500 rounded-xl text-white">
+            <div className="mt-8 p-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white">
               <Users className="w-8 h-8 mb-4" />
               <h3 className="text-lg font-semibold mb-2">نیاز به کمک فوری دارید؟</h3>
               <p className="text-sm mb-4">
@@ -307,7 +308,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-artisan-gradient rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <MessageCircle className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-lg font-bold">ArtisanChat</span>

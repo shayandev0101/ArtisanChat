@@ -49,7 +49,7 @@ export default function PricingPage() {
       limitations: [],
       popular: true,
       buttonText: 'انتخاب پلن حرفه‌ای',
-      buttonVariant: 'artisan'
+      buttonVariant: 'default'
     },
     {
       name: 'تیمی',
@@ -70,36 +70,17 @@ export default function PricingPage() {
       limitations: [],
       popular: false,
       buttonText: 'انتخاب پلن تیمی',
-      buttonVariant: 'creative'
-    }
-  ]
-
-  const faqs = [
-    {
-      question: 'آیا می‌توانم پلن خود را تغییر دهم؟',
-      answer: 'بله، می‌توانید در هر زمان پلن خود را ارتقا یا کاهش دهید. تغییرات از ماه بعد اعمال خواهد شد.'
-    },
-    {
-      question: 'آیا پرداخت امن است؟',
-      answer: 'بله، ما از درگاه‌های پرداخت معتبر و امن استفاده می‌کنیم و اطلاعات شما محفوظ است.'
-    },
-    {
-      question: 'آیا تخفیف سالانه وجود دارد؟',
-      answer: 'بله، با پرداخت سالانه 20% تخفیف دریافت خواهید کرد.'
-    },
-    {
-      question: 'چگونه می‌توانم اشتراک را لغو کنم؟',
-      answer: 'می‌توانید در هر زمان از پنل کاربری خود اشتراک را لغو کنید. دسترسی تا پایان دوره فعلی ادامه خواهد داشت.'
+      buttonVariant: 'secondary'
     }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 space-x-reverse">
-            <div className="w-10 h-10 bg-artisan-gradient rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
@@ -122,7 +103,9 @@ export default function PricingPage() {
               <Button variant="ghost">ورود</Button>
             </Link>
             <Link href="/auth/register">
-              <Button variant="artisan">ثبت‌نام رایگان</Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                ثبت‌نام رایگان
+              </Button>
             </Link>
           </div>
         </nav>
@@ -135,7 +118,7 @@ export default function PricingPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            قیمت‌گذاری <span className="bg-gradient-to-r from-artisan-600 to-creative-600 bg-clip-text text-transparent">شفاف</span>
+            قیمت‌گذاری <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">شفاف</span>
           </h1>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             پلن مناسب خود را انتخاب کنید و از تمام امکانات ArtisanChat بهره‌مند شوید
@@ -153,13 +136,13 @@ export default function PricingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className={`relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                plan.popular ? 'ring-2 ring-artisan-500 scale-105' : ''
+              className={`relative glass dark:glass-dark rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                plan.popular ? 'ring-2 ring-blue-500 scale-105' : ''
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-artisan-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                  <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium">
                     محبوب‌ترین
                   </span>
                 </div>
@@ -223,71 +206,13 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">سوالات متداول</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            پاسخ سوالات رایج درباره قیمت‌گذاری و اشتراک
-          </p>
-        </motion.div>
-
-        <div className="max-w-3xl mx-auto space-y-6">
-          {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg"
-            >
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-lg">
-                {faq.question}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {faq.answer}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-artisan-600 to-creative-600 py-20">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              آماده شروع هستید؟
-            </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              همین الان ثبت‌نام کنید و 14 روز رایگان از تمام ویژگی‌ها استفاده کنید
-            </p>
-            <Link href="/auth/register">
-              <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
-                شروع آزمایشی رایگان
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-artisan-gradient rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <MessageCircle className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-lg font-bold">ArtisanChat</span>
