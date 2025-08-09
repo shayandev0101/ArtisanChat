@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import './globals.css'
+// import './fonts.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
