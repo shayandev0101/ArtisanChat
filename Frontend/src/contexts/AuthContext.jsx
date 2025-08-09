@@ -124,8 +124,13 @@ export function AuthProvider({ children }) {
       dispatch({ type: 'SET_LOADING', payload: true })
       
       const response = await authAPI.register(userData)
-      const { user, token } = response.data
+      
+      if (response.data.requiresVerification) {
+        dispatch({ type: 'SET_LOADING', payload: false })
+        return { success: true, requiresVerification: true }
+      }
 
+      const { user, token } = response.data
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
 

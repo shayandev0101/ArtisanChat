@@ -54,40 +54,42 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
-          </Link>
-          
-          <div className="flex items-center space-x-4 space-x-reverse">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="rounded-full"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-            <Link href="/auth/login">
-              <Button variant="ghost">ورود</Button>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 py-4">
+          <nav className="flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2 space-x-reverse">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold text-foreground">ArtisanChat</span>
             </Link>
-            <Link href="/auth/register">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                ثبت‌نام رایگان
+            
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="rounded-full"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
-            </Link>
-          </div>
-        </nav>
+              <Link href="/auth/login">
+                <Button variant="ghost">ورود</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">
+                  ثبت‌نام رایگان
+                </Button>
+              </Link>
+            </div>
+          </nav>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -97,10 +99,10 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            درباره <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ArtisanChat</span>
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
+            درباره <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">ArtisanChat</span>
           </h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
+          <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
             ما تیمی از خلاق‌ها و توسعه‌دهندگان هستیم که با هدف ایجاد بهترین پلتفرم ارتباطی 
             برای جامعه خلاق‌های ایران، ArtisanChat را طراحی کرده‌ایم.
           </p>
@@ -115,8 +117,8 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">داستان ما</h2>
-            <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+            <h2 className="text-3xl font-bold text-foreground mb-6">داستان ما</h2>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
                 ArtisanChat از یک نیاز واقعی متولد شد. ما خودمان طراحان، عکاس‌ها و فریلنسرهایی بودیم 
                 که با چالش‌های ارتباطی در پروژه‌هایمان دست و پنجه نرم می‌کردیم.
@@ -139,23 +141,23 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="glass dark:glass-dark rounded-2xl p-8 shadow-xl">
+            <div className="bg-card/50 backdrop-blur-sm border rounded-2xl p-8 shadow-lg">
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">10K+</div>
-                  <div className="text-gray-600 dark:text-gray-400">خلاق فعال</div>
+                  <div className="text-3xl font-bold text-primary mb-2">10K+</div>
+                  <div className="text-muted-foreground">خلاق فعال</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-purple-600 mb-2">50K+</div>
-                  <div className="text-gray-600 dark:text-gray-400">نمونه‌کار</div>
+                  <div className="text-muted-foreground">نمونه‌کار</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">1M+</div>
-                  <div className="text-gray-600 dark:text-gray-400">پیام ارسالی</div>
+                  <div className="text-3xl font-bold text-primary mb-2">1M+</div>
+                  <div className="text-muted-foreground">پیام ارسالی</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-purple-600 mb-2">500+</div>
-                  <div className="text-gray-600 dark:text-gray-400">پروژه تکمیل شده</div>
+                  <div className="text-muted-foreground">پروژه تکمیل شده</div>
                 </div>
               </div>
             </div>
@@ -171,8 +173,8 @@ export default function AboutPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">ارزش‌های ما</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4">ارزش‌های ما</h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             این ارزش‌ها راهنمای ما در تصمیم‌گیری‌ها و توسعه محصول هستند
           </p>
         </motion.div>
@@ -185,15 +187,15 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="glass dark:glass-dark rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-card/50 backdrop-blur-sm border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-4">
-                <value.icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-500 rounded-lg flex items-center justify-center mb-4">
+                <value.icon className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-card-foreground mb-2">
                 {value.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {value.description}
               </p>
             </motion.div>
@@ -209,8 +211,8 @@ export default function AboutPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">تیم ما</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4">تیم ما</h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             افرادی که با عشق و تخصص ArtisanChat را می‌سازند
           </p>
         </motion.div>
@@ -223,7 +225,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="glass dark:glass-dark rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center"
+              className="bg-card/50 backdrop-blur-sm border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center"
             >
               <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
                 <img
@@ -232,13 +234,13 @@ export default function AboutPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="text-lg font-semibold text-card-foreground mb-1">
                 {member.name}
               </h3>
-              <p className="text-blue-600 font-medium mb-3">
+              <p className="text-primary font-medium mb-3">
                 {member.role}
               </p>
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {member.bio}
               </p>
             </motion.div>
@@ -247,16 +249,16 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-20">
+      <section className="bg-gradient-to-r from-primary to-purple-600 py-20">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <Target className="w-16 h-16 text-white mx-auto mb-6" />
-            <h2 className="text-4xl font-bold text-white mb-6">ماموریت ما</h2>
-            <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <Target className="w-16 h-16 text-primary-foreground mx-auto mb-6" />
+            <h2 className="text-4xl font-bold text-primary-foreground mb-6">ماموریت ما</h2>
+            <p className="text-xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto leading-relaxed">
               ما می‌خواهیم بزرگ‌ترین و فعال‌ترین جامعه خلاق‌های ایران را بسازیم. 
               جایی که هر خلاق بتواند استعدادش را نشان دهد، با همکاران ارتباط برقرار کند 
               و پروژه‌های بزرگ را به سرانجام برساند.
@@ -271,51 +273,51 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
-        <div className="container mx-auto px-4">
+      <footer className="bg-background border-t">
+        <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-lg font-bold">ArtisanChat</span>
+                <span className="text-lg font-bold text-foreground">ArtisanChat</span>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 پیام‌رسان حرفه‌ای برای خلاق‌ها
               </p>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">محصول</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/features" className="hover:text-white">ویژگی‌ها</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">قیمت‌گذاری</Link></li>
-                <li><Link href="/demo" className="hover:text-white">دمو</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">محصول</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/features" className="hover:text-foreground transition-colors">ویژگی‌ها</Link></li>
+                <li><Link href="/pricing" className="hover:text-foreground transition-colors">قیمت‌گذاری</Link></li>
+                <li><Link href="/demo" className="hover:text-foreground transition-colors">دمو</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">پشتیبانی</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/help" className="hover:text-white">راهنما</Link></li>
-                <li><Link href="/contact" className="hover:text-white">تماس با ما</Link></li>
-                <li><Link href="/faq" className="hover:text-white">سوالات متداول</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">پشتیبانی</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/help" className="hover:text-foreground transition-colors">راهنما</Link></li>
+                <li><Link href="/contact" className="hover:text-foreground transition-colors">تماس با ما</Link></li>
+                <li><Link href="/faq" className="hover:text-foreground transition-colors">سوالات متداول</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">شرکت</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/about" className="hover:text-white">درباره ما</Link></li>
-                <li><Link href="/blog" className="hover:text-white">بلاگ</Link></li>
-                <li><Link href="/careers" className="hover:text-white">فرصت‌های شغلی</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">شرکت</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/about" className="hover:text-foreground transition-colors">درباره ما</Link></li>
+                <li><Link href="/blog" className="hover:text-foreground transition-colors">بلاگ</Link></li>
+                <li><Link href="/careers" className="hover:text-foreground transition-colors">فرصت‌های شغلی</Link></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 ArtisanChat. تمامی حقوق محفوظ است.</p>
+          <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+            <p>&copy; 2025 ArtisanChat. تمامی حقوق محفوظ است.</p>
           </div>
         </div>
       </footer>

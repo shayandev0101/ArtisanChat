@@ -50,6 +50,8 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
+  verifyOtp: (data) => api.post('/auth/verify-otp', data),
+  resendOtp: (data) => api.post('/auth/resend-otp', data),
   login: (credentials) => api.post('/auth/login', credentials),
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
@@ -86,6 +88,7 @@ export const groupsAPI = {
   addMember: (groupId, userId) => api.post(`/groups/${groupId}/members`, { userId }),
   removeMember: (groupId, userId) => api.delete(`/groups/${groupId}/members/${userId}`),
   updateMemberRole: (groupId, userId, role) => api.put(`/groups/${groupId}/members/${userId}`, { role }),
+  search: (params) => api.get('/groups/search', { params }),
 }
 
 // Portfolios API
@@ -110,6 +113,11 @@ export const tasksAPI = {
   deleteTask: (taskId) => api.delete(`/tasks/${taskId}`),
   addComment: (taskId, content) => api.post(`/tasks/${taskId}/comment`, { content }),
   updateStatus: (taskId, status) => api.put(`/tasks/${taskId}/status`, { status }),
+}
+
+// Contact API
+export const contactAPI = {
+  sendMessage: (data) => api.post('/contact', data),
 }
 
 // File upload API

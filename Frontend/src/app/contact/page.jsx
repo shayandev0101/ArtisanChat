@@ -32,14 +32,24 @@ export default function ContactPage() {
     setIsSubmitting(true)
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast({
-        title: "پیام ارسال شد",
-        description: "پیام شما با موفقیت ارسال شد. به زودی با شما تماس خواهیم گرفت.",
+      // Send to backend API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
-      setFormData({ name: '', email: '', subject: '', message: '' })
+
+      if (response.ok) {
+        toast({
+          title: "پیام ارسال شد",
+          description: "پیام شما با موفقیت ارسال شد. به زودی با شما تماس خواهیم گرفت.",
+        })
+        setFormData({ name: '', email: '', subject: '', message: '' })
+      } else {
+        throw new Error('Failed to send message')
+      }
     } catch (error) {
       toast({
         title: "خطا در ارسال",
@@ -98,40 +108,42 @@ export default function ContactPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">ArtisanChat</span>
-          </Link>
-          
-          <div className="flex items-center space-x-4 space-x-reverse">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="rounded-full"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-            <Link href="/auth/login">
-              <Button variant="ghost">ورود</Button>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 py-4">
+          <nav className="flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2 space-x-reverse">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold text-foreground">ArtisanChat</span>
             </Link>
-            <Link href="/auth/register">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                ثبت‌نام رایگان
+            
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="rounded-full"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
-            </Link>
-          </div>
-        </nav>
+              <Link href="/auth/login">
+                <Button variant="ghost">ورود</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">
+                  ثبت‌نام رایگان
+                </Button>
+              </Link>
+            </div>
+          </nav>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -140,10 +152,10 @@ export default function ContactPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            تماس با <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ما</span>
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
+            تماس با <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">ما</span>
           </h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             سوال دارید؟ نیاز به راهنمایی دارید؟ تیم ما آماده کمک به شماست.
           </p>
         </motion.div>
@@ -159,18 +171,18 @@ export default function ContactPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="glass dark:glass-dark rounded-xl p-6 shadow-lg text-center"
+              className="bg-card/50 backdrop-blur-sm border rounded-xl p-6 shadow-lg text-center"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <info.icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <info.icon className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-card-foreground mb-2">
                 {info.title}
               </h3>
-              <p className="text-blue-600 font-medium mb-2">
+              <p className="text-primary font-medium mb-2">
                 {info.value}
               </p>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {info.description}
               </p>
             </motion.div>
@@ -184,11 +196,11 @@ export default function ContactPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">پیام بفرستید</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">پیام بفرستید</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     نام و نام خانوادگی
                   </label>
                   <Input
@@ -200,7 +212,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     ایمیل
                   </label>
                   <Input
@@ -215,7 +227,7 @@ export default function ContactPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   موضوع
                 </label>
                 <Input
@@ -228,7 +240,7 @@ export default function ContactPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   پیام
                 </label>
                 <Textarea
@@ -243,12 +255,12 @@ export default function ContactPage() {
               
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center">
-                    <div className="spinner mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
                     در حال ارسال...
                   </div>
                 ) : (
@@ -267,7 +279,7 @@ export default function ContactPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">سوالات متداول</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">سوالات متداول</h2>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <motion.div
@@ -276,22 +288,22 @@ export default function ContactPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass dark:glass-dark rounded-lg p-6 shadow-sm"
+                  className="bg-card/50 backdrop-blur-sm border rounded-lg p-6 shadow-sm"
                 >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-semibold text-card-foreground mb-2">
                     {faq.question}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
                     {faq.answer}
                   </p>
                 </motion.div>
               ))}
             </div>
             
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white">
+            <div className="mt-8 p-6 bg-gradient-to-r from-primary to-purple-500 rounded-xl text-primary-foreground">
               <Users className="w-8 h-8 mb-4" />
               <h3 className="text-lg font-semibold mb-2">نیاز به کمک فوری دارید؟</h3>
-              <p className="text-sm mb-4">
+              <p className="text-sm mb-4 text-primary-foreground/90">
                 تیم پشتیبانی ما 24/7 آماده پاسخگویی به سوالات شماست.
               </p>
               <Button variant="secondary" size="sm">
@@ -303,51 +315,51 @@ export default function ContactPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
-        <div className="container mx-auto px-4">
+      <footer className="bg-background border-t">
+        <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-lg font-bold">ArtisanChat</span>
+                <span className="text-lg font-bold text-foreground">ArtisanChat</span>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 پیام‌رسان حرفه‌ای برای خلاق‌ها
               </p>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">محصول</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/features" className="hover:text-white">ویژگی‌ها</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">قیمت‌گذاری</Link></li>
-                <li><Link href="/demo" className="hover:text-white">دمو</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">محصول</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/features" className="hover:text-foreground transition-colors">ویژگی‌ها</Link></li>
+                <li><Link href="/pricing" className="hover:text-foreground transition-colors">قیمت‌گذاری</Link></li>
+                <li><Link href="/demo" className="hover:text-foreground transition-colors">دمو</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">پشتیبانی</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/help" className="hover:text-white">راهنما</Link></li>
-                <li><Link href="/contact" className="hover:text-white">تماس با ما</Link></li>
-                <li><Link href="/faq" className="hover:text-white">سوالات متداول</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">پشتیبانی</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/help" className="hover:text-foreground transition-colors">راهنما</Link></li>
+                <li><Link href="/contact" className="hover:text-foreground transition-colors">تماس با ما</Link></li>
+                <li><Link href="/faq" className="hover:text-foreground transition-colors">سوالات متداول</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">شرکت</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/about" className="hover:text-white">درباره ما</Link></li>
-                <li><Link href="/blog" className="hover:text-white">بلاگ</Link></li>
-                <li><Link href="/careers" className="hover:text-white">فرصت‌های شغلی</Link></li>
+              <h3 className="font-semibold text-foreground mb-4">شرکت</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/about" className="hover:text-foreground transition-colors">درباره ما</Link></li>
+                <li><Link href="/blog" className="hover:text-foreground transition-colors">بلاگ</Link></li>
+                <li><Link href="/careers" className="hover:text-foreground transition-colors">فرصت‌های شغلی</Link></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 ArtisanChat. تمامی حقوق محفوظ است.</p>
+          <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+            <p>&copy; 2025 ArtisanChat. تمامی حقوق محفوظ است.</p>
           </div>
         </div>
       </footer>

@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useTheme } from '@/contexts/ThemeContext'
 import { 
   Search, 
@@ -29,7 +30,14 @@ import {
   Bot,
   Settings2,
   Moon,
-  Sun
+  Sun,
+  UserPlus,
+  Crown,
+  Shield,
+  User,
+  Clock,
+  CheckCheck,
+  Check
 } from 'lucide-react'
 
 export default function ChatPage() {
@@ -43,10 +51,11 @@ export default function ChatPage() {
   const [isSending, setIsSending] = useState(false)
   const [typingUsers, setTypingUsers] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [showGroupInfo, setShowGroupInfo] = useState(false)
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
 
-  // Sample data for demonstration (matching the screenshot design)
+  // Sample data matching the screenshot
   const sampleChats = [
     {
       id: '1',
@@ -55,7 +64,9 @@ export default function ChatPage() {
       time: '11:00 AM',
       unread: 105,
       avatar: null,
-      type: 'channel'
+      type: 'channel',
+      members: 1250,
+      isOnline: true
     },
     {
       id: '2', 
@@ -64,7 +75,9 @@ export default function ChatPage() {
       time: '11:00 AM',
       unread: 254,
       avatar: null,
-      type: 'channel'
+      type: 'channel',
+      members: 890,
+      isOnline: true
     },
     {
       id: '3',
@@ -73,7 +86,9 @@ export default function ChatPage() {
       time: '7/29/2025',
       unread: 0,
       avatar: null,
-      type: 'channel'
+      type: 'channel',
+      members: 567,
+      isOnline: false
     },
     {
       id: '4',
@@ -82,7 +97,9 @@ export default function ChatPage() {
       time: 'Sat',
       unread: 0,
       avatar: null,
-      type: 'saved'
+      type: 'saved',
+      members: 1,
+      isOnline: true
     },
     {
       id: '5',
@@ -91,7 +108,9 @@ export default function ChatPage() {
       time: 'Fri',
       unread: 1,
       avatar: null,
-      type: 'channel'
+      type: 'channel',
+      members: 234,
+      isOnline: true
     },
     {
       id: '6',
@@ -100,61 +119,9 @@ export default function ChatPage() {
       time: '3/17/2025',
       unread: 0,
       avatar: null,
-      type: 'group'
-    },
-    {
-      id: '7',
-      name: 'Hyperliquid Live Tracker',
-      lastMessage: 'Increased Long #Hyp... 482472',
-      time: '11:04 AM',
-      unread: 0,
-      avatar: null,
-      type: 'bot'
-    },
-    {
-      id: '8',
-      name: 'PROXY | پروکسی',
-      lastMessage: 'آپ داشتن دیپوتیم کرده بود، یه بوو شروع کرد.',
-      time: '11:04 AM',
-      unread: 57,
-      avatar: null,
-      type: 'channel'
-    },
-    {
-      id: '9',
-      name: 'فیلم سریال ترکی',
-      lastMessage: 'اگر نتونی حیل ضمیمه به این فیلمبردن ...',
-      time: '10:58 AM',
-      unread: 3,
-      avatar: null,
-      type: 'channel'
-    },
-    {
-      id: '10',
-      name: 'APKHUB_VIP',
-      lastMessage: 'Rohit: ARCHIVE OF YOUR XXX DR...',
-      time: '10:57 AM',
-      unread: 20603,
-      avatar: null,
-      type: 'channel'
-    },
-    {
-      id: '11',
-      name: 'SEO 360 | گروه سئو',
-      lastMessage: 'roshanak💜🅰️: 🔥 میمیم',
-      time: '10:56 AM',
-      unread: 701,
-      avatar: null,
-      type: 'group'
-    },
-    {
-      id: '12',
-      name: '... ⬜ ⬜ ⬜ ⬜ کانال خنده',
-      lastMessage: '',
-      time: '10:54 AM',
-      unread: 0,
-      avatar: null,
-      type: 'channel'
+      type: 'group',
+      members: 45,
+      isOnline: true
     }
   ]
 
@@ -165,7 +132,7 @@ export default function ChatPage() {
     { icon: Archive, label: 'Turkish', count: 4 },
     { icon: Edit3, label: 'School', count: 1 },
     { icon: Bot, label: 'Website G', count: 3 },
-    { icon: Settings2, label: 'Programm er', count: 2 },
+    { icon: Settings2, label: 'Programmer', count: 2 },
     { icon: Archive, label: 'ورزش', count: 1 },
     { icon: Bot, label: 'Bot', count: null },
     { icon: Settings, label: 'Edit', count: null }
@@ -188,7 +155,6 @@ export default function ChatPage() {
 
   const loadChats = async () => {
     try {
-      // For now, use sample data
       setChats(sampleChats)
       setIsLoading(false)
     } catch (error) {
@@ -207,7 +173,6 @@ export default function ChatPage() {
         setMessages(prev => [...prev, data.message])
       }
       
-      // Update chat list
       setChats(prev => prev.map(chat => 
         chat.id === data.chatId 
           ? { ...chat, lastMessage: data.message.content, time: new Date().toLocaleTimeString() }
@@ -228,7 +193,6 @@ export default function ChatPage() {
 
   const handleChatSelect = (chat) => {
     setActiveChat(chat)
-    // Load messages for this chat
     setMessages([])
   }
 
@@ -238,20 +202,17 @@ export default function ChatPage() {
 
     setIsSending(true)
     try {
-      // Add message to local state immediately for better UX
       const tempMessage = {
         id: Date.now(),
         content: newMessage.trim(),
         sender: user,
         timestamp: new Date(),
-        type: 'text'
+        type: 'text',
+        status: 'sent'
       }
       
       setMessages(prev => [...prev, tempMessage])
       setNewMessage('')
-      
-      // Here you would send to API
-      // await chatsAPI.sendMessage(activeChat.id, { content: newMessage.trim() })
       
     } catch (error) {
       toast({
@@ -275,7 +236,20 @@ export default function ChatPage() {
       case 'saved':
         return <Archive className="w-4 h-4 text-blue-500" />
       default:
-        return <MessageCircle className="w-4 h-4 text-gray-500" />
+        return <MessageCircle className="w-4 h-4 text-muted-foreground" />
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'sent':
+        return <Check className="w-3 h-3 text-muted-foreground" />
+      case 'delivered':
+        return <CheckCheck className="w-3 h-3 text-muted-foreground" />
+      case 'seen':
+        return <CheckCheck className="w-3 h-3 text-blue-500" />
+      default:
+        return <Clock className="w-3 h-3 text-muted-foreground" />
     }
   }
 
@@ -288,37 +262,35 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background">
       {/* Left Sidebar - Categories */}
-      <div className="w-16 bg-gray-800 dark:bg-gray-950 flex flex-col items-center py-4 space-y-4">
+      <div className="w-16 bg-muted/30 border-l flex flex-col items-center py-4 space-y-2">
         {sidebarItems.map((item, index) => (
           <div key={index} className="relative group">
-            <div className={`p-2 rounded-lg cursor-pointer transition-colors ${
-              item.active 
-                ? 'bg-blue-600 text-white' 
-                : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-            }`}>
+            <Button
+              variant={item.active ? "default" : "ghost"}
+              size="icon"
+              className={`w-10 h-10 rounded-lg ${item.active ? 'bg-primary text-primary-foreground' : ''}`}
+            >
               <item.icon className="w-5 h-5" />
-            </div>
+            </Button>
             {item.count && (
-              <div className="absolute -top-1 -right-1 bg-gray-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                 {item.count}
-              </div>
+              </Badge>
             )}
-            {/* Tooltip */}
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+            <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 border shadow-md">
               {item.label}
             </div>
           </div>
         ))}
         
-        {/* Theme Toggle */}
         <div className="mt-auto">
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="text-gray-400 hover:text-white hover:bg-gray-700"
+            className="w-10 h-10 rounded-lg"
           >
             {theme === 'dark' ? (
               <Sun className="h-5 w-5" />
@@ -330,43 +302,40 @@ export default function ChatPage() {
       </div>
 
       {/* Chat List */}
-      <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="w-80 bg-card border-l flex flex-col">
+        <div className="p-4 border-b bg-card/50 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">چت‌ها</h1>
-            <Button size="sm" variant="ghost">
+            <h1 className="text-lg font-semibold text-card-foreground">چت‌ها</h1>
+            <Button size="icon" variant="ghost" className="h-8 w-8">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           
-          {/* Search */}
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="جست‌وجو..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10 bg-gray-100 dark:bg-gray-700 border-none"
+              className="pr-10 bg-background/50"
             />
           </div>
         </div>
 
-        {/* Chat List */}
         <ScrollArea className="flex-1">
           <div className="p-2">
             {sampleChats.map((chat) => (
               <div
                 key={chat.id}
                 onClick={() => handleChatSelect(chat)}
-                className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                  activeChat?.id === chat.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-accent/50 ${
+                  activeChat?.id === chat.id ? 'bg-accent' : ''
                 }`}
               >
                 <div className="relative ml-3">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={chat.avatar} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-primary-foreground">
                       {getChannelIcon(chat.type)}
                     </AvatarFallback>
                   </Avatar>
@@ -375,25 +344,28 @@ export default function ChatPage() {
                       <Hash className="w-3 h-3 text-white" />
                     </div>
                   )}
+                  {chat.isOnline && chat.type === 'private' && (
+                    <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
+                  )}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-gray-900 dark:text-white truncate text-sm">
+                    <h3 className="font-medium text-card-foreground truncate text-sm">
                       {chat.name}
                     </h3>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       {chat.time}
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-1">
-                    <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {chat.lastMessage}
                     </p>
                     {chat.unread > 0 && (
-                      <div className="bg-gray-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                      <Badge variant="secondary" className="bg-muted text-muted-foreground">
                         {chat.unread > 999 ? '999+' : chat.unread}
-                      </div>
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -408,38 +380,91 @@ export default function ChatPage() {
         {activeChat ? (
           <>
             {/* Chat Header */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-card/50 backdrop-blur-sm border-b p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={activeChat.avatar} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-primary-foreground">
                       {getChannelIcon(activeChat.type)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="font-medium text-gray-900 dark:text-white">
-                      {activeChat.name}
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {typingUsers.length > 0 
-                        ? 'در حال تایپ...'
-                        : activeChat.type === 'group' 
-                          ? `${activeChat.members || 0} عضو`
-                          : 'آنلاین'
-                      }
-                    </p>
+                    <Dialog open={showGroupInfo} onOpenChange={setShowGroupInfo}>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" className="p-0 h-auto text-right">
+                          <div>
+                            <h2 className="font-medium text-card-foreground text-right">
+                              {activeChat.name}
+                            </h2>
+                            <p className="text-sm text-muted-foreground text-right">
+                              {typingUsers.length > 0 
+                                ? 'در حال تایپ...'
+                                : activeChat.type === 'group' || activeChat.type === 'channel'
+                                  ? `${activeChat.members} عضو`
+                                  : activeChat.isOnline ? 'آنلاین' : 'آفلاین'
+                              }
+                            </p>
+                          </div>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle className="text-right">{activeChat.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-3 space-x-reverse">
+                            <Avatar className="w-16 h-16">
+                              <AvatarImage src={activeChat.avatar} />
+                              <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-primary-foreground text-xl">
+                                {getChannelIcon(activeChat.type)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h3 className="font-semibold text-card-foreground">{activeChat.name}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {activeChat.type === 'channel' ? 'کانال' : 
+                                 activeChat.type === 'group' ? 'گروه' : 
+                                 activeChat.type === 'bot' ? 'ربات' : 'پیام‌های ذخیره‌شده'}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 text-center">
+                            <div className="bg-muted/50 rounded-lg p-3">
+                              <div className="text-lg font-bold text-card-foreground">{activeChat.members}</div>
+                              <div className="text-xs text-muted-foreground">عضو</div>
+                            </div>
+                            <div className="bg-muted/50 rounded-lg p-3">
+                              <div className="text-lg font-bold text-card-foreground">1.2K</div>
+                              <div className="text-xs text-muted-foreground">پیام</div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Button variant="outline" className="w-full justify-start">
+                              <UserPlus className="w-4 h-4 ml-2" />
+                              افزودن عضو
+                            </Button>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Settings className="w-4 h-4 ml-2" />
+                              تنظیمات گروه
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
                 
                 <div className="flex items-center space-x-2 space-x-reverse">
-                  <Button size="sm" variant="ghost">
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
                     <Phone className="w-4 h-4" />
                   </Button>
-                  <Button size="sm" variant="ghost">
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
                     <Video className="w-4 h-4" />
                   </Button>
-                  <Button size="sm" variant="ghost">
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </div>
@@ -449,11 +474,13 @@ export default function ChatPage() {
             {/* Messages */}
             <ScrollArea className="flex-1 p-4">
               {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-center h-full text-muted-foreground">
                   <div className="text-center">
-                    <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p>شروع مکالمه</p>
-                    <p className="text-sm">اولین پیام خود را ارسال کنید</p>
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle className="w-10 h-10 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-card-foreground mb-2">شروع مکالمه</h3>
+                    <p className="text-sm text-muted-foreground">اولین پیام خود را ارسال کنید</p>
                   </div>
                 </div>
               ) : (
@@ -462,24 +489,29 @@ export default function ChatPage() {
                     <div
                       key={message.id}
                       className={`flex ${
-                        message.sender.id === user.id ? 'justify-end' : 'justify-start'
+                        message.sender.id === user?.id ? 'justify-end' : 'justify-start'
                       }`}
                     >
                       <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                        message.sender.id === user.id
-                          ? 'bg-blue-500 text-white rounded-br-md'
-                          : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-md shadow-sm border dark:border-gray-600'
+                        message.sender.id === user?.id
+                          ? 'bg-primary text-primary-foreground rounded-br-md'
+                          : 'bg-muted text-card-foreground rounded-bl-md border'
                       }`}>
                         <p className="text-sm">{message.content}</p>
                         <div className="flex items-center justify-between mt-1">
                           <span className={`text-xs ${
-                            message.sender.id === user.id ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                            message.sender.id === user?.id ? 'text-primary-foreground/70' : 'text-muted-foreground'
                           }`}>
                             {new Date(message.timestamp).toLocaleTimeString('fa-IR', {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
                           </span>
+                          {message.sender.id === user?.id && (
+                            <div className="mr-2">
+                              {getStatusIcon(message.status)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -490,13 +522,14 @@ export default function ChatPage() {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-card/50 backdrop-blur-sm border-t p-4">
               <form onSubmit={handleSendMessage} className="flex items-center space-x-2 space-x-reverse">
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="ghost"
                   onClick={() => fileInputRef.current?.click()}
+                  className="h-10 w-10"
                 >
                   <Paperclip className="w-4 h-4" />
                 </Button>
@@ -506,14 +539,14 @@ export default function ChatPage() {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="پیام خود را بنویسید..."
-                    className="pl-10"
+                    className="pl-10 bg-background/50"
                     disabled={isSending}
                   />
                   <Button
                     type="button"
-                    size="sm"
+                    size="icon"
                     variant="ghost"
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
                   >
                     <Smile className="w-4 h-4" />
                   </Button>
@@ -521,10 +554,9 @@ export default function ChatPage() {
                 
                 <Button
                   type="submit"
-                  size="sm"
-                  variant="default"
+                  size="icon"
                   disabled={!newMessage.trim() || isSending}
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="h-10 w-10 bg-primary hover:bg-primary/90"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
@@ -537,23 +569,22 @@ export default function ChatPage() {
                 multiple
                 accept="image/*,video/*,.pdf,.doc,.docx"
                 onChange={(e) => {
-                  // Handle file upload
                   console.log('Files selected:', e.target.files)
                 }}
               />
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <div className="flex-1 flex items-center justify-center bg-background">
             <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Select a chat to start messaging
+              <h2 className="text-xl font-semibold text-foreground mb-2">
+                یک چت انتخاب کنید
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                یک چت انتخاب کنید تا شروع به گفت‌وگو کنید
+              <p className="text-muted-foreground">
+                برای شروع گفت‌وگو یک چت انتخاب کنید
               </p>
             </div>
           </div>

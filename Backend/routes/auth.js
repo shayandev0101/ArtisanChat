@@ -1,12 +1,25 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
+const nodemailer = require('nodemailer')
 const User = require('../models/User')
 const auth = require('../middleware/auth')
 const { body, validationResult } = require('express-validator')
 const rateLimit = require('express-rate-limit')
 
 const router = express.Router()
+
+// Email transporter setup
+const transporter = nodemailer.createTransporter({
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+})
 
 // Rate limiting for auth routes
 const authLimiter = rateLimit({
@@ -82,7 +95,11 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
       })
     }
 
-    // Create new user
+    // Generate OTP
+    const otp = crypto.randomInt(100000, 999999).toString()
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+    // Create new user (unverified)
     const user = new User({
       username,
       email,
@@ -90,9 +107,87 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
       fullName,
       bio: bio || '',
       skills: skills || [],
-      location: location || ''
+      location: location || '',
+      isVerified: false,
+      verificationToken: otp,
+      verificationExpires: otpExpires
     })
 
+    await user.save()
+
+    // Send OTP email
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'کد تایید ArtisanChat',
+        html: `
+          <div style="direction: rtl; font-family: Arial, sans-serif;">
+            <h2>کد تایید حساب کاربری</h2>
+            <p>سلام ${fullName}،</p>
+            <p>کد تایید شما: <strong style="font-size: 24px; color: #3b82f6;">${otp}</strong></p>
+            <p>این کد تا 10 دقیقه معتبر است.</p>
+            <p>با تشکر،<br>تیم ArtisanChat</p>
+          </div>
+        `
+      })
+    } catch (emailError) {
+      console.error('Email send error:', emailError)
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful. Please check your email for verification code.',
+      email: email,
+      requiresVerification: true
+    })
+
+  } catch (error) {
+    console.error('Registration error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Server error during registration'
+    })
+  }
+})
+
+// @route   POST /api/auth/verify-otp
+// @desc    Verify OTP code
+// @access  Public
+router.post('/verify-otp', authLimiter, [
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      })
+    }
+
+    const { email, otp } = req.body
+
+    const user = await User.findOne({ 
+      email,
+      verificationToken: otp,
+      verificationExpires: { $gt: new Date() }
+    })
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired OTP code'
+      })
+    }
+
+    // Verify user
+    user.isVerified = true
+    user.verificationToken = undefined
+    user.verificationExpires = undefined
+    user.isOnline = true
     await user.save()
 
     // Generate JWT token
@@ -102,18 +197,86 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
       { expiresIn: '7d' }
     )
 
-    res.status(201).json({
+    res.json({
       success: true,
-      message: 'User registered successfully',
+      message: 'Email verified successfully',
       token,
       user: user.getPublicProfile()
     })
 
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error('OTP verification error:', error)
     res.status(500).json({
       success: false,
-      message: 'Server error during registration'
+      message: 'Server error during verification'
+    })
+  }
+})
+
+// @route   POST /api/auth/resend-otp
+// @desc    Resend OTP code
+// @access  Public
+router.post('/resend-otp', authLimiter, [
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      })
+    }
+
+    const { email } = req.body
+
+    const user = await User.findOne({ email, isVerified: false })
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or already verified'
+      })
+    }
+
+    // Generate new OTP
+    const otp = crypto.randomInt(100000, 999999).toString()
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000)
+
+    user.verificationToken = otp
+    user.verificationExpires = otpExpires
+    await user.save()
+
+    // Send OTP email
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'کد تایید جدید ArtisanChat',
+        html: `
+          <div style="direction: rtl; font-family: Arial, sans-serif;">
+            <h2>کد تایید جدید</h2>
+            <p>سلام ${user.fullName}،</p>
+            <p>کد تایید جدید شما: <strong style="font-size: 24px; color: #3b82f6;">${otp}</strong></p>
+            <p>این کد تا 10 دقیقه معتبر است.</p>
+            <p>با تشکر،<br>تیم ArtisanChat</p>
+          </div>
+        `
+      })
+    } catch (emailError) {
+      console.error('Email send error:', emailError)
+    }
+
+    res.json({
+      success: true,
+      message: 'New OTP sent to your email'
+    })
+
+  } catch (error) {
+    console.error('Resend OTP error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
     })
   }
 })

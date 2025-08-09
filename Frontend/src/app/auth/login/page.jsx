@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, MessageCircle, Mail, Lock } from 'lucide-react'
+import { Eye, EyeOff, MessageCircle, Mail, Lock, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from '@/hooks/use-toast'
 import Link from 'next/link'
@@ -16,18 +17,18 @@ export default function LoginPage() {
   const { login, isLoading } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    rememberMe: false
   })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({})
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, type, checked } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -65,23 +66,15 @@ export default function LoginPage() {
   }
 
   const handleGoogleLogin = () => {
-    // Implement Google OAuth
-    toast({
-      title: "در حال توسعه",
-      description: "ورود با گوگل به زودی فعال خواهد شد",
-    })
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
   }
 
   const handleGithubLogin = () => {
-    // Implement GitHub OAuth
-    toast({
-      title: "در حال توسعه",
-      description: "ورود با گیت‌هاب به زودی فعال خواهد شد",
-    })
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/github`
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-artisan-50 via-white to-creative-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -93,12 +86,12 @@ export default function LoginPage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-16 h-16 bg-artisan-gradient rounded-2xl flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-gradient-to-r from-primary to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
           >
-            <MessageCircle className="w-8 h-8 text-white" />
+            <MessageCircle className="w-8 h-8 text-primary-foreground" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">خوش آمدید</h1>
-          <p className="text-gray-600 dark:text-gray-400">به حساب کاربری خود وارد شوید</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">خوش آمدید</h1>
+          <p className="text-muted-foreground">به حساب کاربری خود وارد شوید</p>
         </div>
 
         {/* Login Form */}
@@ -106,71 +99,72 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8"
+          className="bg-card/50 backdrop-blur-sm border rounded-2xl shadow-lg p-8"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
-            {errors.general && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-600 dark:text-red-400 text-sm">
-                {errors.general}
-              </div>
-            )}
-
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 ایمیل
               </label>
               <div className="relative">
-                <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="example@email.com"
-                  className={`pr-10 ${errors.email ? 'border-red-500' : ''}`}
+                  className={`pr-10 ${errors.email ? 'border-destructive' : ''}`}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p className="text-destructive text-sm mt-1">{errors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 رمز عبور
               </label>
               <div className="relative">
-                <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="رمز عبور خود را وارد کنید"
-                  className={`pr-10 pl-10 ${errors.password ? 'border-red-500' : ''}`}
+                  className={`pr-10 pl-10 ${errors.password ? 'border-destructive' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="text-destructive text-sm mt-1">{errors.password}</p>
               )}
             </div>
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input type="checkbox" className="rounded border-gray-300 text-artisan-600 focus:ring-artisan-500" />
-                <span className="mr-2 text-sm text-gray-600 dark:text-gray-400">مرا به خاطر بسپار</span>
-              </label>
-              <Link href="/auth/forgot-password" className="text-sm text-artisan-600 hover:text-artisan-700">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Checkbox
+                  id="rememberMe"
+                  name="rememberMe"
+                  checked={formData.rememberMe}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, rememberMe: checked }))}
+                />
+                <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+                  مرا به خاطر بسپار
+                </label>
+              </div>
+              <Link href="/auth/forgot-password" className="text-sm text-primary hover:text-primary/80">
                 فراموشی رمز عبور؟
               </Link>
             </div>
@@ -178,27 +172,29 @@ export default function LoginPage() {
             {/* Submit Button */}
             <Button
               type="submit"
-              variant="artisan"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700"
               disabled={isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="spinner mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
                   در حال ورود...
                 </div>
               ) : (
-                'ورود'
+                <>
+                  ورود
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                </>
               )}
             </Button>
 
             {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">یا</span>
+                <span className="px-2 bg-card text-muted-foreground">یا</span>
               </div>
             </div>
 
@@ -224,9 +220,9 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               حساب کاربری ندارید؟{' '}
-              <Link href="/auth/register" className="text-artisan-600 hover:text-artisan-700 font-medium">
+              <Link href="/auth/register" className="text-primary hover:text-primary/80 font-medium">
                 ثبت‌نام کنید
               </Link>
             </p>

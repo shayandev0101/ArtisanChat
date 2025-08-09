@@ -16,6 +16,7 @@ const chatRoutes = require('./routes/chats')
 const groupRoutes = require('./routes/groups')
 const portfolioRoutes = require('./routes/portfolios')
 const taskRoutes = require('./routes/tasks')
+const contactRoutes = require('./routes/contact')
 
 // Import socket handlers
 const socketHandler = require('./socket/socketHandler')
@@ -63,6 +64,7 @@ app.use('/api/chats', chatRoutes)
 app.use('/api/groups', groupRoutes)
 app.use('/api/portfolios', portfolioRoutes)
 app.use('/api/tasks', taskRoutes)
+app.use('/api/contact', contactRoutes)
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
