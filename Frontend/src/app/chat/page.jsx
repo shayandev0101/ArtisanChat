@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { chatsAPI } from '@/lib/api'
+import { chatsAPI, usersAPI, groupsAPI } from '@/lib/api'
 import { socketManager } from '@/lib/socket'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,10 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useTheme } from '@/contexts/ThemeContext'
 import { 
   Search, 
@@ -37,11 +41,24 @@ import {
   User,
   Clock,
   CheckCheck,
-  Check
+  Check,
+  Pin,
+  PinOff,
+  Trash2,
+  LogOut,
+  Bell,
+  BellOff,
+  Volume2,
+  VolumeX,
+  Copy,
+  Forward,
+  Reply,
+  Edit,
+  Download
 } from 'lucide-react'
 
 export default function ChatPage() {
-  const { user, isLoading: authLoading } = useAuth()
+  const { user, isLoading: authLoading, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const [chats, setChats] = useState([])
   const [activeChat, setActiveChat] = useState(null)
@@ -52,96 +69,44 @@ export default function ChatPage() {
   const [typingUsers, setTypingUsers] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [showGroupInfo, setShowGroupInfo] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [userSettings, setUserSettings] = useState({
+    notifications: true,
+    sounds: true,
+    theme: 'light'
+  })
+  const [newGroupData, setNewGroupData] = useState({
+    name: '',
+    description: '',
+    type: 'group',
+    members: []
+  })
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
-
-  // Sample data matching the screenshot
-  const sampleChats = [
-    {
-      id: '1',
-      name: 'لوازم خانگی نیشت بانه',
-      lastMessage: 'تجاری الیت شرکت اصیل اورجینال',
-      time: '11:00 AM',
-      unread: 105,
-      avatar: null,
-      type: 'channel',
-      members: 1250,
-      isOnline: true
-    },
-    {
-      id: '2', 
-      name: 'Proxy MTProto | پروکسی',
-      lastMessage: 'New MTProto Proxy! Server: U...',
-      time: '11:00 AM',
-      unread: 254,
-      avatar: null,
-      type: 'channel',
-      members: 890,
-      isOnline: true
-    },
-    {
-      id: '3',
-      name: 'Скачать видео из Инст...',
-      lastMessage: 'Kako Band – Dance In Fire, https://...',
-      time: '7/29/2025',
-      unread: 0,
-      avatar: null,
-      type: 'channel',
-      members: 567,
-      isOnline: false
-    },
-    {
-      id: '4',
-      name: 'Saved Messages',
-      lastMessage: '@Timand_Music – Amadi (Raibod) ...',
-      time: 'Sat',
-      unread: 0,
-      avatar: null,
-      type: 'saved',
-      members: 1,
-      isOnline: true
-    },
-    {
-      id: '5',
-      name: 'Appsooner',
-      lastMessage: 'V2RAYNG vless://.... تشکر برای',
-      time: 'Fri',
-      unread: 1,
-      avatar: null,
-      type: 'channel',
-      members: 234,
-      isOnline: true
-    },
-    {
-      id: '6',
-      name: 'Sabz | FrontEnd - VIP',
-      lastMessage: '6 files',
-      time: '3/17/2025',
-      unread: 0,
-      avatar: null,
-      type: 'group',
-      members: 45,
-      isOnline: true
-    }
-  ]
+  const typingTimeoutRef = useRef(null)
 
   const sidebarItems = [
-    { icon: MessageCircle, label: 'All chats', count: null, active: true },
-    { icon: Users, label: 'Personal', count: 1 },
-    { icon: Hash, label: 'University', count: 4 },
-    { icon: Archive, label: 'Turkish', count: 4 },
-    { icon: Edit3, label: 'School', count: 1 },
-    { icon: Bot, label: 'Website G', count: 3 },
-    { icon: Settings2, label: 'Programmer', count: 2 },
-    { icon: Archive, label: 'ورزش', count: 1 },
-    { icon: Bot, label: 'Bot', count: null },
-    { icon: Settings, label: 'Edit', count: null }
+    { icon: MessageCircle, label: 'همه چت‌ها', key: 'all', active: selectedCategory === 'all' },
+    { icon: Users, label: 'شخصی', key: 'personal', count: 1 },
+    { icon: Hash, label: 'دانشگاه', key: 'university', count: 4 },
+    { icon: Archive, label: 'ترکی', key: 'turkish', count: 4 },
+    { icon: Edit3, label: 'مدرسه', key: 'school', count: 1 },
+    { icon: Bot, label: 'وب‌سایت', key: 'website', count: 3 },
+    { icon: Settings2, label: 'برنامه‌نویسی', key: 'programming', count: 2 },
+    { icon: Archive, label: 'ورزش', key: 'sports', count: 1 },
+    { icon: Bot, label: 'ربات', key: 'bot' },
+    { icon: Settings, label: 'ویرایش', key: 'edit' }
   ]
 
   useEffect(() => {
     if (user) {
       loadChats()
       setupSocketListeners()
+      loadUserSettings()
     }
   }, [user])
 
@@ -149,39 +114,104 @@ export default function ChatPage() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    if (searchQuery) {
+      searchUsers()
+    } else {
+      setSearchResults([])
+    }
+  }, [searchQuery])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   const loadChats = async () => {
     try {
-      setChats(sampleChats)
-      setIsLoading(false)
+      const response = await chatsAPI.getChats()
+      setChats(response.data.chats || [])
     } catch (error) {
       toast({
         title: "خطا",
         description: "خطا در بارگذاری چت‌ها",
         variant: "destructive",
       })
+    } finally {
       setIsLoading(false)
     }
   }
 
+  const loadUserSettings = async () => {
+    try {
+      const settings = localStorage.getItem('userSettings')
+      if (settings) {
+        setUserSettings(JSON.parse(settings))
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error)
+    }
+  }
+
+  const saveUserSettings = async (newSettings) => {
+    try {
+      const updatedSettings = { ...userSettings, ...newSettings }
+      setUserSettings(updatedSettings)
+      localStorage.setItem('userSettings', JSON.stringify(updatedSettings))
+      
+      await usersAPI.updateSettings(updatedSettings)
+      toast({
+        title: "تنظیمات ذخیره شد",
+        description: "تنظیمات با موفقیت به‌روزرسانی شد",
+      })
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: "خطا در ذخیره تنظیمات",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) return
+    
+    setIsSearching(true)
+    try {
+      const response = await usersAPI.search({ query: searchQuery })
+      setSearchResults(response.data.users || [])
+    } catch (error) {
+      console.error('Search error:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
   const setupSocketListeners = () => {
+    if (!user) return
+
+    socketManager.connect(localStorage.getItem('token'))
+
     socketManager.on('new_message', (data) => {
-      if (data.chatId === activeChat?.id) {
+      if (data.chatId === activeChat?._id) {
         setMessages(prev => [...prev, data.message])
       }
       
       setChats(prev => prev.map(chat => 
-        chat.id === data.chatId 
-          ? { ...chat, lastMessage: data.message.content, time: new Date().toLocaleTimeString() }
+        chat._id === data.chatId 
+          ? { ...chat, lastMessage: data.message, updatedAt: new Date() }
           : chat
       ))
+
+      if (userSettings.notifications) {
+        toast({
+          title: "پیام جدید",
+          description: `${data.message.sender.fullName}: ${data.message.content}`,
+        })
+      }
     })
 
     socketManager.on('user_typing', (data) => {
-      if (data.chatId === activeChat?.id) {
+      if (data.chatId === activeChat?._id) {
         setTypingUsers(prev => [...prev.filter(u => u.userId !== data.userId), data])
       }
     })
@@ -189,11 +219,33 @@ export default function ChatPage() {
     socketManager.on('user_stop_typing', (data) => {
       setTypingUsers(prev => prev.filter(u => u.userId !== data.userId))
     })
+
+    socketManager.on('message_seen', (data) => {
+      if (data.chatId === activeChat?._id) {
+        setMessages(prev => prev.map(msg => 
+          msg._id === data.messageId 
+            ? { ...msg, seenBy: [...(msg.seenBy || []), data.seenBy] }
+            : msg
+        ))
+      }
+    })
   }
 
-  const handleChatSelect = (chat) => {
+  const handleChatSelect = async (chat) => {
     setActiveChat(chat)
     setMessages([])
+    
+    try {
+      const response = await chatsAPI.getMessages(chat._id)
+      setMessages(response.data.messages || [])
+      socketManager.joinChat(chat._id)
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: "خطا در بارگذاری پیام‌ها",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleSendMessage = async (e) => {
@@ -203,16 +255,21 @@ export default function ChatPage() {
     setIsSending(true)
     try {
       const tempMessage = {
-        id: Date.now(),
+        _id: Date.now(),
         content: newMessage.trim(),
         sender: user,
-        timestamp: new Date(),
+        createdAt: new Date(),
         type: 'text',
-        status: 'sent'
+        seenBy: [{ user: user._id }]
       }
       
       setMessages(prev => [...prev, tempMessage])
       setNewMessage('')
+      
+      await chatsAPI.sendMessage(activeChat._id, { 
+        content: newMessage.trim(),
+        type: 'text'
+      })
       
     } catch (error) {
       toast({
@@ -222,6 +279,95 @@ export default function ChatPage() {
       })
     } finally {
       setIsSending(false)
+    }
+  }
+
+  const handleTyping = () => {
+    if (activeChat) {
+      socketManager.startTyping(activeChat._id)
+      
+      clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = setTimeout(() => {
+        socketManager.stopTyping(activeChat._id)
+      }, 3000)
+    }
+  }
+
+  const handleCreateGroup = async () => {
+    try {
+      if (!newGroupData.name.trim()) {
+        toast({
+          title: "خطا",
+          description: "نام گروه الزامی است",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const response = await groupsAPI.create(newGroupData)
+      
+      toast({
+        title: "گروه ایجاد شد",
+        description: "گروه با موفقیت ایجاد شد",
+      })
+      
+      setShowCreateGroup(false)
+      setNewGroupData({ name: '', description: '', type: 'group', members: [] })
+      loadChats()
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: "خطا در ایجاد گروه",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handlePinChat = async (chatId) => {
+    try {
+      // API call to pin/unpin chat
+      setChats(prev => prev.map(chat => 
+        chat._id === chatId 
+          ? { ...chat, isPinned: !chat.isPinned }
+          : chat
+      ))
+      
+      toast({
+        title: "چت پین شد",
+        description: "چت در بالای لیست قرار گرفت",
+      })
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: "خطا در پین کردن چت",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const startPrivateChat = async (userId) => {
+    try {
+      const response = await chatsAPI.createChat({
+        type: 'private',
+        participants: [userId]
+      })
+      
+      const newChat = response.data.chat
+      setChats(prev => [newChat, ...prev])
+      setActiveChat(newChat)
+      setSearchQuery('')
+      setSearchResults([])
+      
+      toast({
+        title: "چت جدید",
+        description: "چت خصوصی ایجاد شد",
+      })
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: "خطا در ایجاد چت",
+        variant: "destructive",
+      })
     }
   }
 
@@ -253,6 +399,11 @@ export default function ChatPage() {
     }
   }
 
+  const filteredChats = chats.filter(chat => {
+    if (selectedCategory === 'all') return true
+    return chat.category === selectedCategory
+  })
+
   if (authLoading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -270,6 +421,7 @@ export default function ChatPage() {
             <Button
               variant={item.active ? "default" : "ghost"}
               size="icon"
+              onClick={() => setSelectedCategory(item.key)}
               className={`w-10 h-10 rounded-lg ${item.active ? 'bg-primary text-primary-foreground' : ''}`}
             >
               <item.icon className="w-5 h-5" />
@@ -285,7 +437,61 @@ export default function ChatPage() {
           </div>
         ))}
         
-        <div className="mt-auto">
+        <div className="mt-auto space-y-2">
+          {/* Settings */}
+          <Dialog open={showSettings} onOpenChange={setShowSettings}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-right">تنظیمات</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="notifications">اعلان‌ها</Label>
+                  <Switch
+                    id="notifications"
+                    checked={userSettings.notifications}
+                    onCheckedChange={(checked) => saveUserSettings({ notifications: checked })}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="sounds">صداها</Label>
+                  <Switch
+                    id="sounds"
+                    checked={userSettings.sounds}
+                    onCheckedChange={(checked) => saveUserSettings({ sounds: checked })}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="theme">حالت تیره</Label>
+                  <Switch
+                    id="theme"
+                    checked={theme === 'dark'}
+                    onCheckedChange={toggleTheme}
+                  />
+                </div>
+
+                <div className="pt-4 border-t">
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                    onClick={logout}
+                  >
+                    <LogOut className="w-4 h-4 ml-2" />
+                    خروج از حساب
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -306,11 +512,54 @@ export default function ChatPage() {
         <div className="p-4 border-b bg-card/50 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-lg font-semibold text-card-foreground">چت‌ها</h1>
-            <Button size="icon" variant="ghost" className="h-8 w-8">
-              <Plus className="w-4 h-4" />
-            </Button>
+            
+            {/* Create Group/Channel */}
+            <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+              <DialogTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="text-right">ایجاد گروه جدید</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="groupName">نام گروه</Label>
+                    <Input
+                      id="groupName"
+                      value={newGroupData.name}
+                      onChange={(e) => setNewGroupData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="نام گروه را وارد کنید"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="groupDesc">توضیحات</Label>
+                    <Textarea
+                      id="groupDesc"
+                      value={newGroupData.description}
+                      onChange={(e) => setNewGroupData(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="توضیحات گروه (اختیاری)"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex space-x-2 space-x-reverse">
+                    <Button variant="outline" onClick={() => setShowCreateGroup(false)} className="flex-1">
+                      لغو
+                    </Button>
+                    <Button onClick={handleCreateGroup} className="flex-1">
+                      ایجاد گروه
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
+          {/* Search */}
           <div className="relative">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -319,17 +568,39 @@ export default function ChatPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10 bg-background/50"
             />
+            
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                {searchResults.map((searchUser) => (
+                  <div
+                    key={searchUser._id}
+                    onClick={() => startPrivateChat(searchUser._id)}
+                    className="flex items-center p-3 hover:bg-accent cursor-pointer"
+                  >
+                    <Avatar className="w-8 h-8 ml-3">
+                      <AvatarImage src={searchUser.profilePicture} />
+                      <AvatarFallback>{searchUser.fullName?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{searchUser.fullName}</p>
+                      <p className="text-xs text-muted-foreground">@{searchUser.username}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         <ScrollArea className="flex-1">
           <div className="p-2">
-            {sampleChats.map((chat) => (
+            {filteredChats.map((chat) => (
               <div
-                key={chat.id}
+                key={chat._id}
                 onClick={() => handleChatSelect(chat)}
                 className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-accent/50 ${
-                  activeChat?.id === chat.id ? 'bg-accent' : ''
+                  activeChat?._id === chat._id ? 'bg-accent' : ''
                 }`}
               >
                 <div className="relative ml-3">
@@ -351,24 +622,63 @@ export default function ChatPage() {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-card-foreground truncate text-sm">
-                      {chat.name}
-                    </h3>
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <h3 className="font-medium text-card-foreground truncate text-sm">
+                        {chat.name}
+                      </h3>
+                      {chat.isPinned && <Pin className="w-3 h-3 text-primary" />}
+                    </div>
                     <span className="text-xs text-muted-foreground">
-                      {chat.time}
+                      {new Date(chat.updatedAt).toLocaleTimeString('fa-IR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-1">
                     <p className="text-sm text-muted-foreground truncate">
-                      {chat.lastMessage}
+                      {chat.lastMessage?.content || 'هنوز پیامی ارسال نشده'}
                     </p>
-                    {chat.unread > 0 && (
+                    {chat.unreadCount > 0 && (
                       <Badge variant="secondary" className="bg-muted text-muted-foreground">
-                        {chat.unread > 999 ? '999+' : chat.unread}
+                        {chat.unreadCount > 999 ? '999+' : chat.unreadCount}
                       </Badge>
                     )}
                   </div>
                 </div>
+
+                {/* Chat Options */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100">
+                      <MoreVertical className="w-3 h-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handlePinChat(chat._id)}>
+                      {chat.isPinned ? (
+                        <>
+                          <PinOff className="w-4 h-4 ml-2" />
+                          حذف پین
+                        </>
+                      ) : (
+                        <>
+                          <Pin className="w-4 h-4 ml-2" />
+                          پین کردن
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Archive className="w-4 h-4 ml-2" />
+                      آرشیو
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive">
+                      <Trash2 className="w-4 h-4 ml-2" />
+                      حذف چت
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))}
           </div>
@@ -401,7 +711,7 @@ export default function ChatPage() {
                               {typingUsers.length > 0 
                                 ? 'در حال تایپ...'
                                 : activeChat.type === 'group' || activeChat.type === 'channel'
-                                  ? `${activeChat.members} عضو`
+                                  ? `${activeChat.participants?.length || 0} عضو`
                                   : activeChat.isOnline ? 'آنلاین' : 'آفلاین'
                               }
                             </p>
@@ -425,32 +735,34 @@ export default function ChatPage() {
                               <p className="text-sm text-muted-foreground">
                                 {activeChat.type === 'channel' ? 'کانال' : 
                                  activeChat.type === 'group' ? 'گروه' : 
-                                 activeChat.type === 'bot' ? 'ربات' : 'پیام‌های ذخیره‌شده'}
+                                 activeChat.type === 'bot' ? 'ربات' : 'چت خصوصی'}
                               </p>
                             </div>
                           </div>
                           
                           <div className="grid grid-cols-2 gap-4 text-center">
                             <div className="bg-muted/50 rounded-lg p-3">
-                              <div className="text-lg font-bold text-card-foreground">{activeChat.members}</div>
+                              <div className="text-lg font-bold text-card-foreground">{activeChat.participants?.length || 0}</div>
                               <div className="text-xs text-muted-foreground">عضو</div>
                             </div>
                             <div className="bg-muted/50 rounded-lg p-3">
-                              <div className="text-lg font-bold text-card-foreground">1.2K</div>
+                              <div className="text-lg font-bold text-card-foreground">{messages.length}</div>
                               <div className="text-xs text-muted-foreground">پیام</div>
                             </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <Button variant="outline" className="w-full justify-start">
-                              <UserPlus className="w-4 h-4 ml-2" />
-                              افزودن عضو
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                              <Settings className="w-4 h-4 ml-2" />
-                              تنظیمات گروه
-                            </Button>
-                          </div>
+                          {activeChat.type === 'group' && (
+                            <div className="space-y-2">
+                              <Button variant="outline" className="w-full justify-start">
+                                <UserPlus className="w-4 h-4 ml-2" />
+                                افزودن عضو
+                              </Button>
+                              <Button variant="outline" className="w-full justify-start">
+                                <Settings className="w-4 h-4 ml-2" />
+                                تنظیمات گروه
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -464,9 +776,38 @@ export default function ChatPage() {
                   <Button size="icon" variant="ghost" className="h-8 w-8">
                     <Video className="w-4 h-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="icon" variant="ghost" className="h-8 w-8">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Search className="w-4 h-4 ml-2" />
+                        جست‌وجو در چت
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handlePinChat(activeChat._id)}>
+                        {activeChat.isPinned ? (
+                          <>
+                            <PinOff className="w-4 h-4 ml-2" />
+                            حذف پین
+                          </>
+                        ) : (
+                          <>
+                            <Pin className="w-4 h-4 ml-2" />
+                            پین کردن
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">
+                        <Trash2 className="w-4 h-4 ml-2" />
+                        حذف چت
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -487,35 +828,94 @@ export default function ChatPage() {
                 <div className="space-y-4">
                   {messages.map((message) => (
                     <div
-                      key={message.id}
+                      key={message._id}
                       className={`flex ${
-                        message.sender.id === user?.id ? 'justify-end' : 'justify-start'
+                        message.sender._id === user?._id ? 'justify-end' : 'justify-start'
                       }`}
                     >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                        message.sender.id === user?.id
+                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl group relative ${
+                        message.sender._id === user?._id
                           ? 'bg-primary text-primary-foreground rounded-br-md'
                           : 'bg-muted text-card-foreground rounded-bl-md border'
                       }`}>
+                        {message.sender._id !== user?._id && activeChat.type === 'group' && (
+                          <p className="text-xs font-medium mb-1 text-primary">
+                            {message.sender.fullName}
+                          </p>
+                        )}
+                        
                         <p className="text-sm">{message.content}</p>
+                        
                         <div className="flex items-center justify-between mt-1">
                           <span className={`text-xs ${
-                            message.sender.id === user?.id ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                            message.sender._id === user?._id ? 'text-primary-foreground/70' : 'text-muted-foreground'
                           }`}>
-                            {new Date(message.timestamp).toLocaleTimeString('fa-IR', {
+                            {new Date(message.createdAt).toLocaleTimeString('fa-IR', {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
                           </span>
-                          {message.sender.id === user?.id && (
+                          {message.sender._id === user?._id && (
                             <div className="mr-2">
-                              {getStatusIcon(message.status)}
+                              {getStatusIcon(message.status || 'sent')}
                             </div>
                           )}
+                        </div>
+
+                        {/* Message Options */}
+                        <div className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                                <MoreVertical className="w-3 h-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem>
+                                <Reply className="w-4 h-4 ml-2" />
+                                پاسخ
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Forward className="w-4 h-4 ml-2" />
+                                فوروارد
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Copy className="w-4 h-4 ml-2" />
+                                کپی
+                              </DropdownMenuItem>
+                              {message.sender._id === user?._id && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem>
+                                    <Edit className="w-4 h-4 ml-2" />
+                                    ویرایش
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="text-destructive">
+                                    <Trash2 className="w-4 h-4 ml-2" />
+                                    حذف
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Typing Indicator */}
+                  {typingUsers.length > 0 && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted text-card-foreground px-4 py-2 rounded-2xl rounded-bl-md">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div ref={messagesEndRef} />
                 </div>
               )}
@@ -537,7 +937,10 @@ export default function ChatPage() {
                 <div className="flex-1 relative">
                   <Input
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+                      setNewMessage(e.target.value)
+                      handleTyping()
+                    }}
                     placeholder="پیام خود را بنویسید..."
                     className="pl-10 bg-background/50"
                     disabled={isSending}
